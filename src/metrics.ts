@@ -1,4 +1,4 @@
-import { LevelDb } from "./leveldb";
+ import { LevelDb } from "./leveldb";
 import WriteStream from "level-ws";
 
 export class Metric {
@@ -29,7 +29,7 @@ export class MetricsHandler {
     stream.on("close", callback);
 
     met.forEach(m => {
-      stream.write({ key: `metric:${key}${m.timestamp}`, value: m.value });
+      stream.write({ key: `metric:${key}:${m.timestamp}`, value: m.value });
     });
 
     stream.end();
@@ -49,11 +49,15 @@ export class MetricsHandler {
       })
       .on("data", (data: any) => {
         const [, k, timestamp] = data.key.split(":");
+        console.log(k);
         const value = data.value;
         if (key != k) {
           console.log(`Level DB error: ${data} does not match key ${key}`);
         }
-        met.push(new Metric(timestamp, value));
+        else {
+          met.push(new Metric(timestamp, value));
+        }
+        
       });
   }
 }
